@@ -2,10 +2,14 @@ import React from 'react'
 import { StyleSheet, Text, View, TextInput, Button } from "react-native";
 
 export const FormSchedule = (props) => {
+    const pressHandler = () => {
+        props.onSubmit('Пример 1')
+    }
+
     return (
         <View style={styles.container}>
             <TextInput style={styles.input} />
-            <Button title='Кнопка' />
+            <Button onPress={pressHandler} title='Кнопка' />
         </View>
     )
 }
