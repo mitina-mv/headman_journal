@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, FlatList, ScrollView } from "react-native";
 import { Navbar } from "./src/components/Navbar";
 import { FormSchedule } from "./src/components/FormSchedule";
 import { Schedule } from "./src/components/Schedule";
@@ -19,24 +19,25 @@ export default function App() {
     };
 
     return (
-        <View style={styles.container}>
-            <Navbar title="eee"></Navbar>
+        <View>
+            <Navbar title="спонсор Мегафон" />
             <FormSchedule onSubmit={addSubject} />
-            <StatusBar style="auto" />
+            <StatusBar style="auto" /> 
 
-            <View style={styles.container}>
-                <Text style={styles.text}>Список предметов</Text>
-                {subjects.map((subject) => {
-                    return (
-                        <Schedule
-                            key={subject.id}
-                            title={subject.title}
-                        ></Schedule>
-                    );
-                })}
-            </View>
+            <FlatList
+                data={subjects}
+                renderItem={({ item }) => (
+                    <Schedule title={item.title}></Schedule>
+                )}
+                keyExtractor={(item) => item.id}
+                style={styles.list}
+            />
         </View>
     );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    list: {
+        height: 400
+    }
+});

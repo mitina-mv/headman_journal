@@ -18,7 +18,7 @@ export const FormSchedule = (props) => {
             <TextInput
                 style={styles.input}
                 onChangeText={setValue}
-                value={value}
+                value={value.toString()}
                 placeholder="Введите название предмета"
             />
             <Button onPress={pressHandler} title="Кнопка" />
