@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, FlatList, ScrollView } from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import { Navbar } from "./src/components/Navbar";
 import { FormSchedule } from "./src/components/FormSchedule";
 import { Schedule } from "./src/components/Schedule";
