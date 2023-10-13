@@ -1,5 +1,6 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 
 export default function Layout() {
   return (
@@ -12,12 +13,11 @@ export default function Layout() {
         name="time"
         options={{
           title: "Время",
-          tabBarIcon: ({focused}) => {
-            if(focused)
-                return <FontAwesome name="clock-o" size={24} color="#30BA8F" />
-            else 
-                return <FontAwesome name="clock-o" size={24} color="#474A51" />
-            },
+          tabBarIcon: ({focused}) => <FontAwesome
+            name="clock-o"
+            size={24}
+            color={focused ? "#30BA8F" : "#474A51"}
+            />,
           headerStyle: {
             backgroundColor: "#424242",
           },
@@ -32,12 +32,11 @@ export default function Layout() {
         name="group"
         options={{
           title: "Группа",
-          tabBarIcon: ({focused}) => {
-            if(focused)
-                return <FontAwesome name="users" size={24} color="#30BA8F" />
-            else 
-                return <FontAwesome name="users" size={24} color="#474A51" />
-            },
+          tabBarIcon: ({focused}) => <FontAwesome
+            name="users"
+            size={24}
+            color={focused ? "#30BA8F" : "#474A51"}
+            />,
           headerStyle: {
             backgroundColor: "#424242",
           },
@@ -53,15 +52,25 @@ export default function Layout() {
         name="index"
         options={{
           title: "Главная",
-          tabBarIcon: ({focused}) => {
-            if(focused)
-                return <FontAwesome name="home" size={24} color="#30BA8F" />
-            else 
-                return <FontAwesome name="home" size={24} color="#474A51" />
-            },
+          tabBarIcon: ({focused}) => <FontAwesome
+          name="home"
+          size={24}
+          color={focused ? "#30BA8F" : "#474A51"}
+          />,
           headerStyle: {
             backgroundColor: "#424242",
           },
+          headerRight: () => (
+            <Link href="/settings" asChild style={styles.settingsButton}>
+              <Pressable>
+              <FontAwesome
+                name="cog"
+                size={24}
+                color="#fff"
+                />
+              </Pressable>
+            </Link>
+          ),
 
           headerTintColor: "#fff",
           headerTitleStyle: {
@@ -73,12 +82,30 @@ export default function Layout() {
         name="schedule"
         options={{
           title: "Расписание",
-          tabBarIcon: ({focused}) => {
-            if(focused)
-                return <FontAwesome name="calendar" size={24} color="#30BA8F" />
-            else 
-                return <FontAwesome name="calendar" size={24} color="#474A51" />
-            },
+          tabBarIcon: ({focused}) => <FontAwesome
+          name="calendar"
+          size={24}
+          color={focused ? "#30BA8F" : "#474A51"}
+          />,
+          headerStyle: {
+            backgroundColor: "#424242",
+          },
+
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="subjects"
+        options={{
+          title: "Предметы",
+          tabBarIcon: ({focused}) => <FontAwesome
+          name="book"
+          size={24}
+          color={focused ? "#30BA8F" : "#474A51"}
+          />,
           headerStyle: {
             backgroundColor: "#424242",
           },
@@ -91,14 +118,10 @@ export default function Layout() {
       />
       <Tabs.Screen
         name="settings"
+        
         options={{
           title: "Настройки",
-          tabBarIcon: ({focused}) => {
-            if(focused)
-                return <FontAwesome name="cog" size={24} color="#30BA8F" />
-            else 
-                return <FontAwesome name="cog" size={24} color="#474A51" />
-            },
+          href: null,
           headerStyle: {
             backgroundColor: "#424242",
           },
@@ -112,3 +135,11 @@ export default function Layout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+    settingsButton: {
+      padding: 20,
+      paddingBottom: 0,
+      paddingTop: 0,
+    },
+  });
