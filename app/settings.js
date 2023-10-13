@@ -3,13 +3,12 @@ import { Link } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import DateSwitcher from "./../components/DateSwitcher";
 
-export default function Index() {
+export default function Page() {
   return (
     <SafeAreaProvider>
         <View style={styles.container}>
-            <DateSwitcher />
             <View style={styles.content}>
-                <Text>Моя страница!</Text>
+                <Text>Настройки!</Text>
             </View>
         </View>
     </SafeAreaProvider>
