@@ -1,72 +1,96 @@
-import { View, Text, Pressable, StyleSheet, Button, FlatList } from "react-native";
-import { Link } from "expo-router";
+import {
+	View,
+	StyleSheet,
+	FlatList,
+} from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import DateSwitcher from "./../components/DateSwitcher";
-import { useEffect, useState } from 'react';
-import { setupDatabase } from './../modules/Database';
-import * as SQLite from 'expo-sqlite';
+import { useEffect, useState } from "react";
+import * as SQLite from "expo-sqlite";
+import FlatListItem from "../components/FlatListItem";
+import FormAddItem from "./../components/FormAddItem";
 
 export default function Time() {
-  const [times, setTimes] = useState([]);
-  const db = SQLite.openDatabase('jornal.db');
+	const [times, setTimes] = useState([]);
+	const db = SQLite.openDatabase("jornal.db");
 
-  useEffect(() => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `select * from times;`,
-        [],
-        (_, { rows: { _array } }) => setTimes(_array)
-      );
-    });
-  }, []);
+	useEffect(() => {
+		db.transaction((tx) => {
+			tx.executeSql(
+				`select * from times;`,
+				[],
+				(_, { rows: { _array } }) => setTimes(_array)
+			);
+		});
+	}, []);
 
-  const addTime = () => {
-    db.transaction(tx => {
-      tx.executeSql(
-        'INSERT INTO times (name) VALUES (?);',
-        ['900'],
-        (_, result) => {
-          console.log(`Добавлен элемент: `, result);
-          setTimes(() => [
-            ...times,
-            {
-              id: result.insertId,
-              name: '11'
-            }
-          ])
-        },
-        (_, error) => {
-          console.error('Ошибка при добавлении элемента: ', error);
-        }
-      );
-    });
-  }
+	const addTime = (name) => {
+		db.transaction((tx) => {
+			tx.executeSql(
+				"INSERT INTO times (name) VALUES (?);",
+				[name],
+				(_, result) => {
+					console.log(`Добавлен элемент: `, name);
+					setTimes(() => [
+						...times,
+						{
+							id: result.insertId,
+							name: name,
+						},
+					]);
+				},
+				(_, error) => {
+					console.error("Ошибка при добавлении элемента: ", error);
+				}
+			);
+		});
+	};
 
-  return (
-    <SafeAreaProvider>
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <Text>Время</Text>
-                <View>
-                    <Text>SQLite Database Example</Text>
-                    <Button title="Добавить элемент" onPress={addTime} />
-                </View>
+	const deleteTime = (id) => {
+        db.transaction((tx) => {
+			tx.executeSql(
+				"DELETE FROM times WHERE id=(?);",
+				[id],
+				(_, result) => {
+					console.log(`Удалили: `, id);
+					setTimes((prev) => prev.filter((item) => item.id != id));
+				},
+				(_, error) => {
+					console.error("Ошибка при удалении элемента: ", error);
+				}
+			);
+		});
+		
+	};
 
-                <FlatList data={times} renderItem={({ item }) => (
-                    <Text>{item.name}</Text>
-                )} keyExtractor={(item) => item.id}></FlatList>
-            </View>
-        </View>
-    </SafeAreaProvider>
-  );
+	return (
+		<SafeAreaProvider>
+			<View style={styles.container}>
+				<View style={styles.content}>
+                    <FormAddItem onSubmit={addTime} placeholder='Введите время в формате 8:00-9:30' />                    
+
+					<FlatList
+						data={times}
+						renderItem={({ item }) => (
+							<FlatListItem
+								name={item.name}
+                                id={item.id}
+                                onDelete={deleteTime}
+							/>
+						)}
+						keyExtractor={(item) => item.id}
+					></FlatList>
+				</View>
+			</View>
+		</SafeAreaProvider>
+	);
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  content: {
-    flex: 1,
-  }
+	container: {
+		flex: 1,
+		justifyContent: "space-between",
+	},
+	content: {
+		flex: 1,
+	},
 });
