@@ -2,23 +2,46 @@ import { View, Text, Pressable, StyleSheet, Button, FlatList } from "react-nativ
 import { Link } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import DateSwitcher from "./../components/DateSwitcher";
-import { useEffect } from 'react';
-import { setupDatabase, insertItem, getTimes } from './../modules/Database';
+import { useEffect, useState } from 'react';
+import { setupDatabase } from './../modules/Database';
+import * as SQLite from 'expo-sqlite';
 
 export default function Time() {
-    let dataTable = [];
-    useEffect(() => {
-        setupDatabase(); // Создание таблицы при запуске приложения
-        dataTable = getTimes();
-      }, []);
-    
-      const handleAddItem = async () => {
-        insertItem('9:40'); // Добавление элемента в таблицу
-        console.log('111', dataTable);
+  const [times, setTimes] = useState([]);
+  const db = SQLite.openDatabase('jornal.db');
 
-        dataTable = await getTimes();
-        console.log('444', dataTable);
-      };
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `select * from times;`,
+        [],
+        (_, { rows: { _array } }) => setTimes(_array)
+      );
+    });
+  }, []);
+
+  const addTime = () => {
+    db.transaction(tx => {
+      tx.executeSql(
+        'INSERT INTO times (name) VALUES (?);',
+        ['900'],
+        (_, result) => {
+          console.log(`Добавлен элемент: `, result);
+          setTimes(() => [
+            ...times,
+            {
+              id: result.insertId,
+              name: '11'
+            }
+          ])
+        },
+        (_, error) => {
+          console.error('Ошибка при добавлении элемента: ', error);
+        }
+      );
+    });
+  }
+
   return (
     <SafeAreaProvider>
         <View style={styles.container}>
@@ -26,10 +49,10 @@ export default function Time() {
                 <Text>Время</Text>
                 <View>
                     <Text>SQLite Database Example</Text>
-                    <Button title="Добавить элемент" onPress={handleAddItem} />
+                    <Button title="Добавить элемент" onPress={addTime} />
                 </View>
 
-                <FlatList data={dataTable} renderItem={({ item }) => (
+                <FlatList data={times} renderItem={({ item }) => (
                     <Text>{item.name}</Text>
                 )} keyExtractor={(item) => item.id}></FlatList>
             </View>
