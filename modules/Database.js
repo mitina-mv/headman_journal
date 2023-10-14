@@ -45,7 +45,7 @@ export const setupDatabase = () => {
 	// таблица предметов
 	db.transaction((tx) => {
 		tx.executeSql(
-			"create table IF NOT EXISTS subjects (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR);",
+			"create table IF NOT EXISTS subjects (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR, reduction VARCHAR);",
 			[],
 			(_, result) => {
 				console.log("Таблица subjects создана успешно");

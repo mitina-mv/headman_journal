@@ -1,12 +1,13 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import {THEME} from './../modules/theme'
 
 export default function Layout() {
 	return (
 		<Tabs
 			screenOptions={{
-				tabBarActiveTintColor: "#424242",
+				tabBarActiveTintColor: THEME.MAIN_COLOR,
 			}}
 		>
 			<Tabs.Screen
@@ -17,14 +18,14 @@ export default function Layout() {
 						<FontAwesome
 							name="clock-o"
 							size={24}
-							color={focused ? "#30BA8F" : "#474A51"}
+							color={focused ? THEME.ACTIVE_COLOR : THEME.UNACTIVE_COLOR}
 						/>
 					),
 					headerStyle: {
-						backgroundColor: "#424242",
+						backgroundColor: THEME.MAIN_COLOR,
 					},
 
-					headerTintColor: "#fff",
+					headerTintColor: THEME.HEADER_TEXT_COLOR,
 					headerTitleStyle: {
 						fontWeight: "bold",
 					},
@@ -38,14 +39,14 @@ export default function Layout() {
 						<FontAwesome
 							name="users"
 							size={24}
-							color={focused ? "#30BA8F" : "#474A51"}
+							color={focused ? THEME.ACTIVE_COLOR : THEME.UNACTIVE_COLOR}
 						/>
 					),
 					headerStyle: {
-						backgroundColor: "#424242",
+						backgroundColor: THEME.MAIN_COLOR,
 					},
 
-					headerTintColor: "#fff",
+					headerTintColor: THEME.HEADER_TEXT_COLOR,
 					headerTitleStyle: {
 						fontWeight: "bold",
 					},
@@ -60,11 +61,11 @@ export default function Layout() {
 						<FontAwesome
 							name="home"
 							size={24}
-							color={focused ? "#30BA8F" : "#474A51"}
+							color={focused ? THEME.ACTIVE_COLOR : THEME.UNACTIVE_COLOR}
 						/>
 					),
 					headerStyle: {
-						backgroundColor: "#424242",
+						backgroundColor: THEME.MAIN_COLOR,
 					},
 					headerRight: () => (
 						<Link
@@ -76,13 +77,13 @@ export default function Layout() {
 								<FontAwesome
 									name="cog"
 									size={24}
-									color="#fff"
+									color={THEME.HEADER_TEXT_COLOR}
 								/>
 							</Pressable>
 						</Link>
 					),
 
-					headerTintColor: "#fff",
+					headerTintColor: THEME.HEADER_TEXT_COLOR,
 					headerTitleStyle: {
 						fontWeight: "bold",
 					},
@@ -96,14 +97,14 @@ export default function Layout() {
 						<FontAwesome
 							name="calendar"
 							size={24}
-							color={focused ? "#30BA8F" : "#474A51"}
+							color={focused ? THEME.ACTIVE_COLOR : THEME.UNACTIVE_COLOR}
 						/>
 					),
 					headerStyle: {
-						backgroundColor: "#424242",
+						backgroundColor: THEME.MAIN_COLOR,
 					},
 
-					headerTintColor: "#fff",
+					headerTintColor: THEME.HEADER_TEXT_COLOR,
 					headerTitleStyle: {
 						fontWeight: "bold",
 					},
@@ -117,14 +118,14 @@ export default function Layout() {
 						<FontAwesome
 							name="book"
 							size={24}
-							color={focused ? "#30BA8F" : "#474A51"}
+							color={focused ? THEME.ACTIVE_COLOR : THEME.UNACTIVE_COLOR}
 						/>
 					),
 					headerStyle: {
-						backgroundColor: "#424242",
+						backgroundColor: THEME.MAIN_COLOR,
 					},
 
-					headerTintColor: "#fff",
+					headerTintColor: THEME.HEADER_TEXT_COLOR,
 					headerTitleStyle: {
 						fontWeight: "bold",
 					},
@@ -136,29 +137,19 @@ export default function Layout() {
 					title: "Настройки",
 					href: null,
 					headerStyle: {
-						backgroundColor: "#424242",
+						backgroundColor: THEME.MAIN_COLOR,
 					},
-
-					headerTintColor: "#fff",
+					headerTintColor: THEME.HEADER_TEXT_COLOR,
 					headerTitleStyle: {
 						fontWeight: "bold",
 					},
 				}}
 			/>
 			<Tabs.Screen
-				name="modalSubject"
+				name="create"
 				options={{
-					title: "Форма предмета",
 					href: null,
-					headerStyle: {
-						backgroundColor: "#424242",
-					},
-
-					headerTintColor: "#fff",
-					headerTitleStyle: {
-						fontWeight: "bold",
-					},
-					presentation: 'modal',
+					headerShown: false,
 				}}
 			/>
 		</Tabs>

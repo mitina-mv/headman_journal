@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import * as SQLite from "expo-sqlite";
 import FlatListItem from "../components/FlatListItem";
 import { Link } from "expo-router";
-import FormAddItem from "./../components/FormAddItem";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 
@@ -13,6 +12,7 @@ export default function Time() {
 	const db = SQLite.openDatabase("jornal.db");
 
 	useEffect(() => {
+		console.log('переход');
 		db.transaction((tx) => {
 			tx.executeSql(
 				`select * from subjects;`,
@@ -21,28 +21,6 @@ export default function Time() {
 			);
 		});
 	}, []);
-
-	const addTime = (name) => {
-		db.transaction((tx) => {
-			tx.executeSql(
-				"INSERT INTO subjects (name) VALUES (?);",
-				[name],
-				(_, result) => {
-					console.log(`Добавлен элемент: `, name);
-					setSubjects(() => [
-						...subjects,
-						{
-							id: result.insertId,
-							name: name,
-						},
-					]);
-				},
-				(_, error) => {
-					console.error("Ошибка при добавлении элемента: ", error);
-				}
-			);
-		});
-	};
 
 	const deleteTime = (id) => {
 		db.transaction((tx) => {
@@ -68,7 +46,7 @@ export default function Time() {
 						data={subjects}
 						renderItem={({ item }) => (
 							<FlatListItem
-								name={item.name}
+								name={item.name + ` (${item.reduction})`}
 								id={item.id}
 								onDelete={deleteTime}
 							/>
@@ -77,7 +55,7 @@ export default function Time() {
 					></FlatList>
 
 					<Link
-						href="/modalSubject"
+						href="/create/subject"
 						asChild
 						style={styles.addButton}
 					>

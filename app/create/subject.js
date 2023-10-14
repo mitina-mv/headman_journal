@@ -10,25 +10,51 @@ import {
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import {THEME} from './../../modules/theme'
+import * as SQLite from "expo-sqlite";
 
 
 export default function Page() {
 	const [value, setValue] = useState([]);
 	const [reduction, setReduction] = useState([]);
 
+	const db = SQLite.openDatabase("jornal.db");
+
+	// db.transaction((tx) => {
+	// 	tx.executeSql('DROP TABLE IF EXISTS subjects', [], (_, result) => {
+	// 	  console.log('Таблица успешно удалена');
+	// 	}, (error) => {
+	// 	  console.error('Ошибка при удалении таблицы:', error);
+	// 	});
+	//   });
+
     const pressHandler = () => {
-        if(value.trim() &&  reduction.trim()) {
-            onSubmit({
-				name: value,
-				reduction: reduction
-			})
-            setValue('')
-            setReduction('')
+        if(value.trim() && reduction.trim()) {
+            addTime(value.trim(), reduction.trim())
         } else {
-            Alert.alert('Название предмета не может быть пустым!')
+            Alert.alert('Все поля должны быть заполнены!')	
         }
     };
+
+	const addTime = (name, red) => {
+		console.log('ok');
+
+		db.transaction((tx) => {
+			tx.executeSql(
+				"INSERT INTO subjects (name, reduction) VALUES (?, ?);",
+				[name, red],
+				(_, result) => {
+					console.log(`Добавлен элемент: `, value);
+					router.replace('/subjects');
+				},
+				(_, error) => {
+					console.error("Ошибка при добавлении элемента: ", error);
+				}
+			);
+		});
+	};
+
 	return (
 		<SafeAreaProvider>
 			<View style={styles.container}>
@@ -90,7 +116,7 @@ const styles = StyleSheet.create({
 	addButton: {
 		flexDirection: 'row',
 		gap: 10,
-		backgroundColor: "#009d00",
+		backgroundColor: THEME.ACTIVE_COLOR,
 		padding: 10,
 		borderRadius: 5,
 		paddingHorizontal: 15,
@@ -108,7 +134,7 @@ const styles = StyleSheet.create({
 	cancelButton: {
 		flexDirection: 'row',
 		gap: 10,
-		backgroundColor: "#b00a0a",
+		backgroundColor: THEME.DANGER_COLOR,
 		padding: 10,
 		borderRadius: 5,
 		paddingHorizontal: 15,
