@@ -2,7 +2,7 @@ import { View, StyleSheet, FlatList, Pressable } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import * as SQLite from "expo-sqlite";
-import FlatListItem from "../components/FlatListItem";
+import FlatListItem from "../src/components/FlatListItem";
 import { Link } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 

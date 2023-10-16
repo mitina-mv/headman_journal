@@ -6,8 +6,8 @@ import {
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import * as SQLite from "expo-sqlite";
-import FlatListItem from "../components/FlatListItem";
-import FormAddItem from "./../components/FormAddItem";
+import FlatListItem from "./../src/components/FlatListItem";
+import FormAddItem from "./../src/components/FormAddItem";
 
 export default function Time() {
 	const [times, setTimes] = useState([]);

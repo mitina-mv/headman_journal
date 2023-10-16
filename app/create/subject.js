@@ -11,7 +11,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
-import {THEME} from './../../modules/theme'
+import {THEME} from './../../src/modules/theme'
 import * as SQLite from "expo-sqlite";
 
 
