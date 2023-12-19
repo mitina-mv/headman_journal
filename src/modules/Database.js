@@ -32,7 +32,7 @@ export const setupDatabase = () => {
 	// таблица семестров
 	db.transaction((tx) => {
 		tx.executeSql(
-			"create table IF NOT EXISTS semesters (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR);",
+			"create table IF NOT EXISTS semesters (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR, active BOOLEAN);",
 			[],
 			(_, result) => {
 				console.log("Таблица semesters создана успешно");
@@ -80,14 +80,14 @@ export const setupDatabase = () => {
 	db.transaction((tx) => {
 		tx.executeSql(
 			`CREATE TABLE IF NOT EXISTS attendance (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date DATE,
-        person_id INTEGER,
-        schedule_id INTEGER,
-        absent BOOLEAN DEFAULT 0,
-        FOREIGN KEY (person_id) REFERENCES people (id),
-        FOREIGN KEY (schedule_id) REFERENCES schedule (id)
-      );`,
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			date DATE,
+			person_id INTEGER,
+			schedule_id INTEGER,
+			absent BOOLEAN DEFAULT 0,
+			FOREIGN KEY (person_id) REFERENCES people (id),
+			FOREIGN KEY (schedule_id) REFERENCES schedule (id)
+		);`,
 			[],
 			(_, result) => {
 				console.log("Таблица attendance создана успешно");

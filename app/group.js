@@ -13,7 +13,6 @@ export default function Time() {
 	const db = SQLite.openDatabase("jornal.db");
 
 	useEffect(() => {
-		console.log('переход');
 		fetchData();
 	}, [isRefreshing]);
 	  
