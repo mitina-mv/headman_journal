@@ -22,7 +22,7 @@ export default function Time() {
 		  tx.executeSql(
 			`select * from subjects;`,
 			[],
-			(_, { rows: { _array } }) => setSubjects(_arraydeleteSubject),
+			(_, { rows: { _array } }) => setSubjects(_array),
 			(_, error) => {
 			  console.error("Ошибка при получении данных: ", error);
 			}
@@ -37,7 +37,7 @@ export default function Time() {
 			[id],
 			(_, result) => {
 			  console.log(`Удалили: `, id);
-			  fetchData(); // Обновляем данные после удаления
+			  fetchData();
 			},
 			(_, error) => {
 			  console.error("Ошибка при удалении элемента: ", error);

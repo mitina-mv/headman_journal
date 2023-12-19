@@ -22,6 +22,21 @@ export default function Layout() {
 					},
 				}}
 			/>
+			<Stack.Screen
+				name="people"
+				options={{
+					title: "Добавление учащегося",
+					presentation: "modal",
+					href: null,
+					headerStyle: {
+						backgroundColor: THEME.MAIN_COLOR,
+					},
+					headerTintColor: THEME.HEADER_TEXT_COLOR,
+					headerTitleStyle: {
+						fontWeight: "bold",
+					},
+				}}
+			/>
 		</Stack>
 	);
 }

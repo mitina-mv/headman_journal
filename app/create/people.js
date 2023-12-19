@@ -11,34 +11,34 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
-import {THEME} from './../../src/modules/theme'
+import {THEME} from '../../src/modules/theme'
 import * as SQLite from "expo-sqlite";
 
 
 export default function Page() {
-	const [value, setValue] = useState([]);
-	const [reduction, setReduction] = useState([]);
+	const [name, setName] = useState([]);
+	const [firstname, setFirstname] = useState([]);
 
 	const db = SQLite.openDatabase("jornal.db");
 
     const pressHandler = () => {
-        if(value.trim() && reduction.trim()) {
-            addSubject(value.trim(), reduction.trim())
+        if(name.trim() && firstname.trim()) {
+            addPeople(name.trim(), firstname.trim())
         } else {
             Alert.alert('Все поля должны быть заполнены!')	
         }
     };
 
-	const addSubject = (name, red) => {
+	const addPeople = (name, fname) => {
 		console.log('ok');
 
 		db.transaction((tx) => {
 			tx.executeSql(
-				"INSERT INTO subjects (name, reduction) VALUES (?, ?);",
-				[name, red],
+				"INSERT INTO peoples (name, firstname) VALUES (?, ?);",
+				[name, fname],
 				(_, result) => {
-					console.log(`Добавлен элемент: `, value);
-					router.replace('/subjects');
+					console.log(`Добавлен элемент: `, name, fname);
+					router.replace('/group');
 				},
 				(_, error) => {
 					console.error("Ошибка при добавлении элемента: ", error);
@@ -52,19 +52,19 @@ export default function Page() {
 			<View style={styles.container}>
 				<TextInput
 					style={styles.input}
-					onChangeText={setValue}
-					value={value.toString()}
-					placeholder='Введите название предмета'
+					onChangeText={setName}
+					name={name.toString()}
+					placeholder='Введите имя студента'
 				/>
 				<TextInput
 					style={styles.input}
-					onChangeText={setReduction}
-					value={reduction.toString()}
-					placeholder='Введите сокращение предмета'
+					onChangeText={setFirstname}
+					name={firstname.toString()}
+					placeholder='Введите фамилию студента'
 				/>
 				<TouchableOpacity style={styles.buttonGroup}>
 					<Link
-						href="/subjects"
+						href="/group"
 						asChild
 						style={styles.cancelButton}
 					>
@@ -75,7 +75,7 @@ export default function Page() {
 
 					<Pressable  style={styles.addButton} onPress={pressHandler}>
 						<FontAwesome name="plus" size={18} color="#fff" />
-						<Text style={styles.addButtonText}>Сохранить</Text>
+						<Text style={styles.addButtonText}>Добавить</Text>
 					</Pressable>
 				</TouchableOpacity>
 			</View>
