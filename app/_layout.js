@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import {THEME} from './../modules/theme'
+import {THEME} from './../src/modules/theme'
 
 export default function Layout() {
 	return (

@@ -1,6 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Link } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { View, Text, StyleSheet } from "react-native";
 import DateSwitcher from "./../src/components/DateSwitcher";
 import { useEffect } from "react";
 import { setupDatabase } from "./../src/modules/Database";
@@ -11,14 +9,12 @@ export default function Page() {
 	}, []);
 
 	return (
-		<SafeAreaProvider>
-			<View style={styles.container}>
-				<DateSwitcher />
-				<View style={styles.content}>
-					<Text>Моя страница!</Text>
-				</View>
+		<View style={styles.container}>
+			<DateSwitcher />
+			<View style={styles.content}>
+				<Text>Моя страница!</Text>
 			</View>
-		</SafeAreaProvider>
+		</View>
 	);
 }
 
