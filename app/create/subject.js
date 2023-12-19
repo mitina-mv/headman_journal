@@ -38,6 +38,8 @@ export default function Page() {
 				[name, red],
 				(_, result) => {
 					console.log(`Добавлен элемент: `, value);
+					setValue([]);
+					setReduction([]);
 					router.replace('/subjects');
 				},
 				(_, error) => {

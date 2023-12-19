@@ -25,7 +25,7 @@ export default function Layout() {
 			<Stack.Screen
 				name="people"
 				options={{
-					title: "Добавление учащегося",
+					title: "Добавление студента",
 					presentation: "modal",
 					href: null,
 					headerStyle: {

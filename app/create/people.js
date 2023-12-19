@@ -16,8 +16,8 @@ import * as SQLite from "expo-sqlite";
 
 
 export default function Page() {
-	const [name, setName] = useState([]);
-	const [firstname, setFirstname] = useState([]);
+	const [name, setName] = useState('');
+	const [firstname, setFirstname] = useState('');
 
 	const db = SQLite.openDatabase("jornal.db");
 
@@ -38,6 +38,8 @@ export default function Page() {
 				[name, fname],
 				(_, result) => {
 					console.log(`Добавлен элемент: `, name, fname);
+					setName('')
+					setFirstname('')
 					router.replace('/group');
 				},
 				(_, error) => {
@@ -52,14 +54,14 @@ export default function Page() {
 			<View style={styles.container}>
 				<TextInput
 					style={styles.input}
-					onChangeText={setName}
-					name={name.toString()}
+					onChangeText={(text) => setName(text || '')}
+					value={name.toString()}
 					placeholder='Введите имя студента'
 				/>
 				<TextInput
 					style={styles.input}
-					onChangeText={setFirstname}
-					name={firstname.toString()}
+					onChangeText={(text) => setFirstname(text || '')}
+					value={firstname.toString()}
 					placeholder='Введите фамилию студента'
 				/>
 				<TouchableOpacity style={styles.buttonGroup}>

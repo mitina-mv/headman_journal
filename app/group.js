@@ -20,7 +20,7 @@ export default function Time() {
 	const fetchData = () => {
 		db.transaction((tx) => {
 		  tx.executeSql(
-			`select * from peoples;`,
+			`select * from peoples ORDER BY name;`,
 			[],
 			(_, { rows: { _array } }) => setPeoples(_array),
 			(_, error) => {
@@ -60,7 +60,7 @@ export default function Time() {
 						data={peoples}
 						renderItem={({ item }) => (
 							<FlatListItem
-								name={`${item.name} ${item.firstname}`}
+								name={`${item.firstname} ${item.name}`}
 								id={item.id}
 								onDelete={deletePeople}
 							/>
