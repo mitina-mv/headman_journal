@@ -124,6 +124,21 @@ export default function Layout() {
 					headerStyle: {
 						backgroundColor: THEME.MAIN_COLOR,
 					},
+					headerRight: () => (
+						<Pressable
+						  onPress={() => {
+							// Ваш код для выполнения функции
+							console.log("Функция выполняется");
+						  }}
+						  style={styles.settingsButton}
+						>
+						  <FontAwesome
+							name="refresh"
+							size={24}
+							color={THEME.HEADER_TEXT_COLOR}
+						  />
+						</Pressable>
+					  ),
 
 					headerTintColor: THEME.HEADER_TEXT_COLOR,
 					headerTitleStyle: {

@@ -9,33 +9,47 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function Time() {
 	const [subjects, setSubjects] = useState([]);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const db = SQLite.openDatabase("jornal.db");
 
 	useEffect(() => {
 		console.log('переход');
+		fetchData();
+	}, [isRefreshing]);
+	  
+	const fetchData = () => {
 		db.transaction((tx) => {
-			tx.executeSql(
-				`select * from subjects;`,
-				[],
-				(_, { rows: { _array } }) => setSubjects(_array)
-			);
+		  tx.executeSql(
+			`select * from subjects;`,
+			[],
+			(_, { rows: { _array } }) => setSubjects(_arraydeleteSubject),
+			(_, error) => {
+			  console.error("Ошибка при получении данных: ", error);
+			}
+		  );
 		});
-	}, []);
+	};
 
-	const deleteTime = (id) => {
+	const deleteSubject = (id) => {
 		db.transaction((tx) => {
-			tx.executeSql(
-				"DELETE FROM subjects WHERE id=(?);",
-				[id],
-				(_, result) => {
-					console.log(`Удалили: `, id);
-					setSubjects((prev) => prev.filter((item) => item.id != id));
-				},
-				(_, error) => {
-					console.error("Ошибка при удалении элемента: ", error);
-				}
-			);
+		  tx.executeSql(
+			"DELETE FROM subjects WHERE id=(?);",
+			[id],
+			(_, result) => {
+			  console.log(`Удалили: `, id);
+			  fetchData(); // Обновляем данные после удаления
+			},
+			(_, error) => {
+			  console.error("Ошибка при удалении элемента: ", error);
+			}
+		  );
 		});
+	};
+
+	const handleRefresh = () => {
+		setIsRefreshing(true);
+		fetchData();
+		setIsRefreshing(false);
 	};
 
 	return (
@@ -48,10 +62,12 @@ export default function Time() {
 							<FlatListItem
 								name={item.name + ` (${item.reduction})`}
 								id={item.id}
-								onDelete={deleteTime}
+								onDelete={deleteSubject}
 							/>
 						)}
 						keyExtractor={(item) => item.id}
+						refreshing={isRefreshing}
+						onRefresh={handleRefresh}
 					></FlatList>
 
 					<Link
