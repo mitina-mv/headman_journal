@@ -20,6 +20,7 @@ export default function Time() {
 				[],
 				(_, { rows: { _array } }) => {
 					if (_array.length > 0) {
+						console.log(_array);
 						setCurrentSemester(_array[0]);
 					} else {
 						setCurrentSemester(null);
@@ -37,7 +38,7 @@ export default function Time() {
 
 	const fetchSchedule = (nedela) => {
 		if (!currentSemester) {
-			console.error("Текущий семестр не определен.");
+			// console.error("Текущий семестр не определен.");
 			return;
 		}
 
@@ -82,6 +83,7 @@ export default function Time() {
 
 	const handleRefresh = () => {
 		setIsRefreshing(true);
+		fetchCurrentSemester();
 		fetchSchedule("white");
 		fetchSchedule("green");
 		setIsRefreshing(false);
@@ -89,7 +91,7 @@ export default function Time() {
 
 	const toggleNedela = (nedela) => {
 		setSelectedNedela(nedela);
-		handleRefresh()
+		handleRefresh();
 	};
 
 	const groupScheduleByDay = (schedule) => {
