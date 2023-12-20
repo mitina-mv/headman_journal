@@ -19,7 +19,7 @@ export default function Time() {
 	const fetchData = () => {
 		db.transaction((tx) => {
 		  tx.executeSql(
-			`select * from peoples ORDER BY name;`,
+			`select * from peoples ORDER BY firstname;`,
 			[],
 			(_, { rows: { _array } }) => setPeoples(_array),
 			(_, error) => {

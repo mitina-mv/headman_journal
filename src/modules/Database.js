@@ -83,6 +83,7 @@ export const setupDatabase = () => {
         subject_id INTEGER NOT NULL,
         time_id INTEGER NOT NULL,
 		nedela VARCHAR NOT NULL,
+		day INTEGER NOT NULL,
         semester_id INTEGER NOT NULL,
         FOREIGN KEY (subject_id) REFERENCES subjects (id),
         FOREIGN KEY (time_id) REFERENCES times (id),
