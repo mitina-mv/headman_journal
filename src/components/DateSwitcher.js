@@ -10,7 +10,7 @@ const DateSwitcher = ({ currentDate, onDateChange }) => {
     };
 
 	// Русские сокращения дней недели и месяцев
-	const daysOfWeekNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+	const daysOfWeekNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
 	const monthsNames = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
 
 	return (
