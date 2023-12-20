@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Pressable, Text, ScrollView } from "react-native";
+import {
+	View,
+	StyleSheet,
+	FlatList,
+	Pressable,
+	Text,
+	ScrollView,
+} from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SQLite from "expo-sqlite";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -114,36 +121,38 @@ export default function Time() {
 			return (
 				<View key={day}>
 					<Text style={styles.dayHeading}>{getDayName(day)}</Text>
-					<FlatList
-						data={scheduleForDay}
-						renderItem={({ item }) => (
-							<View style={styles.scheduleItem}>
-								<Text style={styles.scheduleItemTime}>
-									{item.time_name}
-								</Text>
-								<Text style={styles.scheduleItemText}>
-									{item.subject_name}
-								</Text>
-								<Pressable
-									onPress={() =>
-										deleteSchedule(item.id, selectedNedela)
-									}
-								>
-									<Text style={styles.deleteButton}>
-										Удалить
+					{scheduleForDay.length > 0 ? (
+						<View>
+							{scheduleForDay.map((item) => (
+								<View key={item.id} style={styles.scheduleItem}>
+									<Text style={styles.scheduleItemTime}>
+										{item.time_name}
 									</Text>
-								</Pressable>
-							</View>
-						)}
-						ListEmptyComponent={() => (
-							<View style={styles.scheduleItem}>
-								<Text style={styles.noScheduleText}>
-									Нет занятий
-								</Text>
-							</View>
-						)}
-						keyExtractor={(item) => item.id.toString()}
-					/>
+									<Text style={styles.scheduleItemText}>
+										{item.subject_name}
+									</Text>
+									<Pressable
+										onPress={() =>
+											deleteSchedule(
+												item.id,
+												selectedNedela
+											)
+										}
+									>
+										<Text style={styles.deleteButton}>
+											Удалить
+										</Text>
+									</Pressable>
+								</View>
+							))}
+						</View>
+					) : (
+						<View style={styles.scheduleItem}>
+							<Text style={styles.noScheduleText}>
+								Нет занятий
+							</Text>
+						</View>
+					)}
 				</View>
 			);
 		});
@@ -207,11 +216,11 @@ export default function Time() {
 					</View>
 
 					<ScrollView>
-					{renderGroupedSchedule(
-						selectedNedela === "white"
-							? groupedWhiteSchedule
-							: groupedGreenSchedule
-					)}
+						{renderGroupedSchedule(
+							selectedNedela === "white"
+								? groupedWhiteSchedule
+								: groupedGreenSchedule
+						)}
 					</ScrollView>
 
 					<Link
@@ -233,7 +242,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: "space-between",
-		padding: 10
+		padding: 10,
 	},
 	content: {
 		flex: 1,
@@ -271,7 +280,7 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: "bold",
 		marginBottom: 5,
-		marginTop: 10
+		marginTop: 10,
 	},
 	scheduleItem: {
 		flexDirection: "row",
@@ -287,9 +296,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	scheduleItemTime: {
-		fontWeight: '700',
-		color: '#424242',
-		paddingRight: 10
+		fontWeight: "700",
+		color: "#424242",
+		paddingRight: 10,
 	},
 	noScheduleText: {
 		color: "#888", // Либо другой цвет на ваш выбор

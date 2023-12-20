@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView } from "react-native";
 import DateSwitcher from "./../src/components/DateSwitcher";
 import { setupDatabase } from "./../src/modules/Database";
 import * as SQLite from "expo-sqlite";
@@ -7,7 +7,7 @@ import * as SQLite from "expo-sqlite";
 const db = SQLite.openDatabase("jornal.db");
 
 export default function Page() {
-	const [currentDate, setCurrentDate] = useState(new Date());
+	const [currentDate, setCurDate] = useState(new Date((new Date()).getTime() + 3 * 60 * 60 * 1000)); // (new Date()).getTime() + 3 * 60 * 60 * 1000)
 	const [students, setStudents] = useState([]);
 	const [schedule, setSchedule] = useState([]);
 	const [attendance, setAttendance] = useState([]);
@@ -19,6 +19,13 @@ export default function Page() {
 		fetchSchedule();
 		fetchAttendance();
 	}, [currentDate]);
+
+	const updateDate = (newDate) => {
+	  	setCurDate(newDate)
+		fetchSchedule(newDate);
+		fetchAttendance(newDate);
+
+	}
 
 	const fetchStudents = () => {
 		db.transaction((tx) => {
@@ -33,14 +40,10 @@ export default function Page() {
 				}
 			);
 		});
-
-		console.log(attendance);
-		console.log(schedule);
-		console.log(students);
 	};
 
-	const fetchSchedule = () => {
-		const dayOfWeek = currentDate
+	const fetchSchedule = (curDate = currentDate) => {
+		const dayOfWeek = curDate
 			.toLocaleString("en-us", { weekday: "short" })
 			.toLowerCase()
 			.split(", ")[0];
@@ -48,7 +51,7 @@ export default function Page() {
 
 		db.transaction((tx) => {
 			tx.executeSql(
-				"SELECT schedule.*, subjects.reduction as subject_reduction FROM schedule LEFT JOIN subjects ON schedule.subject_id = subjects.id WHERE schedule.day = ? AND schedule.nedela = ?;", // TODO поменять неделю
+				"SELECT schedule.*, subjects.reduction as subject_reduction FROM schedule LEFT JOIN subjects ON schedule.subject_id = subjects.id WHERE schedule.day = ? AND schedule.nedela = ?;",
 				[dayOfWeek, selectedNedela],
 				(_, { rows: { _array } }) => {
 					setSchedule(_array);
@@ -60,8 +63,8 @@ export default function Page() {
 		});
 	};
 
-	const fetchAttendance = () => {
-		const formattedDate = formatDate(currentDate);
+	const fetchAttendance = (curDate = currentDate) => {
+		const formattedDate = formatDate(curDate);
 
 		db.transaction((tx) => {
 			tx.executeSql(
@@ -88,35 +91,51 @@ export default function Page() {
 		setSelectedNedela(nedela);
 		fetchAttendance();
 		fetchSchedule();
-		console.log(nedela);
+		console.log(schedule);
+		console.log('attendance toggleNedela:',attendance);
 	};
 
 	const markAttendance = (studentId, subjectId) => {
 		const formattedDate = formatDate(currentDate);
-
+	  
 		db.transaction((tx) => {
-			tx.executeSql(
-				"INSERT OR REPLACE INTO attendance (date, person_id, schedule_id, absent) VALUES (?, ?, ?, NOT COALESCE((SELECT absent FROM attendance WHERE date = ? AND person_id = ? AND schedule_id = ?), 0));",
-				[
-					formattedDate,
-					studentId,
-					subjectId,
-					formattedDate,
-					studentId,
-					subjectId,
-				],
-				(_, result) => {
+		  tx.executeSql(
+			"SELECT id, absent FROM attendance WHERE date = ? AND person_id = ? AND schedule_id = ?;",
+			[formattedDate, studentId, subjectId],
+			(_, { rows: { _array } }) => {
+			  if (_array.length > 0) {
+				const { id, absent } = _array[0];
+				tx.executeSql(
+				  "DELETE FROM attendance WHERE id = ?;",
+				  [id],
+				  (_, result) => {
+					console.log("Запись удалена");
 					fetchAttendance();
-				},
-				(_, error) => {
-					console.error(
-						"Ошибка при обновлении посещаемости: ",
-						error
-					);
-				}
-			);
+				  },
+				  (_, error) => {
+					console.error("Ошибка при удалении записи: ", error);
+				  }
+				);
+			  } else {
+				tx.executeSql(
+				  "INSERT INTO attendance (date, person_id, schedule_id, absent) VALUES (?, ?, ?, 1);",
+				  [formattedDate, studentId, subjectId],
+				  (_, result) => {
+					console.log("Запись создана");
+					fetchAttendance();
+				  },
+				  (_, error) => {
+					console.error("Ошибка при создании записи: ", error);
+				  }
+				);
+			  }
+			},
+			(_, error) => {
+			  console.error("Ошибка при проверке записи: ", error);
+			}
+		  );
 		});
-	};
+	  };
 
 	return (
 		<View style={styles.container}>
@@ -146,10 +165,10 @@ export default function Page() {
 				
 				<DateSwitcher
 					currentDate={currentDate}
-					onDateChange={setCurrentDate}
+					onDateChange={updateDate}
 				/>
 
-				<View style={styles.table}>
+				<ScrollView style={styles.table}>
 					{/* Заголовок таблицы */}
 					<View style={styles.tableRow}>
 						<View style={styles.tableCell} />
@@ -191,7 +210,7 @@ export default function Page() {
 							))}
 						</View>
 					))}
-				</View>
+				</ScrollView>
 			</View>
 		</View>
 	);
