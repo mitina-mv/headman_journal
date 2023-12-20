@@ -158,6 +158,7 @@ export default function Page() {
 							</View>
 						</TouchableOpacity>
 					)}
+                    <View style={styles.buttonContainer}>
 					{semester.length !== 0 && semester[0].name !== "1 сем" && (
 						<TouchableOpacity
 							onPress={() => {
@@ -183,7 +184,13 @@ export default function Page() {
 							</View>
 						</TouchableOpacity>
 					)}
+                    </View>
+                    <Text style={styles.otherSettings}>
+                        Скоро здесь будут другие настройки...
+                    </Text>
 				</View>
+
+               
 			</View>
 		</SafeAreaProvider>
 	);
@@ -201,6 +208,7 @@ const styles = StyleSheet.create({
 		padding: 15,
 		borderBottomColor: "#ccc",
 		borderBottomWidth: 1,
+        fontSize: 20
 	},
 	activeText: {
 		color: "#30BA8F",
@@ -232,4 +240,14 @@ const styles = StyleSheet.create({
 		color: "white",
 		fontWeight: "bold",
 	},
+    buttonContainer: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+    otherSettings: {
+        fontSize: 20,
+        color: "#aaa",
+        padding: 10,
+        paddingTop: 50
+    }
 });

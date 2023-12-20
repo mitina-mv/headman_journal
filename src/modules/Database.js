@@ -67,11 +67,22 @@ export const setupDatabase = () => {
 	});
 	// таблица расписания
 	db.transaction((tx) => {
+		// tx.executeSql(
+		// 	"DROP TABLE IF EXISTS schedule",
+		// 	[],
+		// 	(_, result) => {
+		// 		console.log("Таблица semesters создана успешно");
+		// 	},
+		// 	(_, error) => {
+		// 		console.error("Ошибка при создании таблицы semesters: ", error);
+		// 	}
+		// );
 		tx.executeSql(
 			`CREATE TABLE IF NOT EXISTS schedule (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         subject_id INTEGER NOT NULL,
         time_id INTEGER NOT NULL,
+		nedela VARCHAR NOT NULL,
         semester_id INTEGER NOT NULL,
         FOREIGN KEY (subject_id) REFERENCES subjects (id),
         FOREIGN KEY (time_id) REFERENCES times (id),
