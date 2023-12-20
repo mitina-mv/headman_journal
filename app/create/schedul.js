@@ -6,6 +6,7 @@ import {
 	TouchableOpacity,
 	Pressable,
 	Alert,
+	Button,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
@@ -17,14 +18,18 @@ import PickerModal from 'react-native-picker-modal-view';
 
 
 export default function Page() {
-	const [selectedNedela, setSelectedNedela] = useState("white");
+	const [selectedNedela, setSelectedNedela] = useState([]);
 	const [subjects, setSubjects] = useState([]);
+	const [times, setTimes] = useState([]);
 	const [selectedSubject, setSelectedSubject] = useState([]);
-
+	const [selectedTime, setSelectedTime] = useState([]);
+	const [selectedDay, setSelectedDay] = useState([]);
+	const [currentSemester, setCurrentSemester] = useState(null);
 
 	const db = SQLite.openDatabase("jornal.db");
 
 	useEffect(() => {
+		console.log(selectedNedela.Name);
 		fetchData();
 	}, []);
 
@@ -39,13 +44,50 @@ export default function Page() {
 					Name: item.name + ` (${item.reduction})`,
 					Value: item.id
 				  }));
-				console.log(data);
 				setSubjects(data)},
 			(_, error) => {
-			  console.error("Ошибка при получении данных: ", error);
+			  console.error("Ошибка при получении данных предметов: ", error);
 			}
 		  );
 		});
+
+		db.transaction((tx) => {
+		  tx.executeSql(
+			`select * from times;`,
+			[],
+			(_, { rows: { _array } }) => {
+				let data = _array.map(item => ({
+					Id: item.id,
+					Name: item.name,
+					Value: item.id
+				  }));
+				setTimes(data)},
+			(_, error) => {
+			  console.error("Ошибка при получении данных времени: ", error);
+			}
+		  );
+		});
+
+		db.transaction((tx) => {
+			tx.executeSql(
+				`select * from semesters where active = true;`,
+				[],
+				(_, { rows: { _array } }) => {
+					console.log(_array);
+					if (_array.length > 0) {
+						setCurrentSemester(_array[0]);
+					} else {
+						setCurrentSemester(null);
+					}
+				},
+				(_, error) => {
+					console.error(
+						"Ошибка при получении текущего семестра: ",
+						error
+					);
+				}
+			);
+		})
 	};
 
     const pressHandler = () => {
@@ -75,7 +117,17 @@ export default function Page() {
 	return (
 		<SafeAreaProvider>
 			<View style={styles.container}>
-				<PickerModal
+				<PickerModal				
+					renderSelectView={(disabled, selected, showModal) =>
+						<TouchableOpacity style={styles.input} onPress={showModal}>
+							<View style={styles.row}>
+							<Text style={styles.inputText}>
+								{selectedNedela.Name ? selectedNedela.Name : 'Выбор недели'}
+							</Text>
+							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
+							</View>
+						</TouchableOpacity>
+					}
 					onSelected={(selected) => {
 						setSelectedNedela(selected)
 					}}
@@ -92,6 +144,16 @@ export default function Page() {
 				/>
 
 				<PickerModal
+					renderSelectView={(disabled, selected, showModal) =>
+						<TouchableOpacity style={styles.input} onPress={showModal}>
+							<View style={styles.row}>
+							<Text style={styles.inputText}>
+								{selectedSubject.Name ? selectedSubject.Name : 'Выбор предмета'}
+							</Text>
+							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
+							</View>
+						</TouchableOpacity>
+					}
 					onSelected={(selected) => {
 						setSelectedSubject(selected)
 					}}
@@ -103,21 +165,62 @@ export default function Page() {
 					searchPlaceholderText={'Поиск...'}
 					style={styles.input}
 				/>
-				{/* <TextInput
+
+				<PickerModal
+					renderSelectView={(disabled, selected, showModal) =>
+						<TouchableOpacity style={styles.input} onPress={showModal}>
+							<View style={styles.row}>
+							<Text style={styles.inputText}>
+								{selectedTime.Name ? selectedTime.Name : 'Выбор времени'}
+							</Text>
+							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
+							</View>
+						</TouchableOpacity>
+					}
+					onSelected={(selected) => {
+						setSelectedTime(selected)
+					}}
+					items={times}
+					showToTopButton={true}
+					selected={selectedTime}
+					requireSelection={true}
+					selectPlaceholderText={'Выбор времени'}
+					searchPlaceholderText={'Поиск...'}
 					style={styles.input}
-					onChangeText={setValue}
-					value={value.toString()}
-					placeholder='Введите название предмета'
 				/>
-				<TextInput
-					style={styles.input}
-					onChangeText={setReduction}
-					value={reduction.toString()}
-					placeholder='Введите сокращение предмета'
-				/> */}
+
+				<PickerModal
+					renderSelectView={(disabled, selected, showModal) =>
+						<TouchableOpacity style={styles.input} onPress={showModal}>
+							<View style={styles.row}>
+							<Text style={styles.inputText}>
+								{selectedDay.Name ? selectedDay.Name : 'Выбор дня недели'}
+							</Text>
+							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
+							</View>
+						</TouchableOpacity>
+					}
+					onSelected={(selected) => {
+						setSelectedDay(selected)
+					}}
+					items={[
+						{Id: 1, Name: "ПН", Value: 'mon'},
+						{Id: 2, Name: "ВТ", Value: 'tue'},
+						{Id: 3, Name: "СР", Value: 'wed'},
+						{Id: 4, Name: "ЧТ", Value: 'thu'},
+						{Id: 5, Name: "ПТ", Value: 'fri'},
+						{Id: 6, Name: "СБ", Value: 'sat'},
+						{Id: 7, Name: "ВС", Value: 'sun'},
+					]}
+					showToTopButton={true}
+					selected={selectedDay}
+					requireSelection={true}
+					selectPlaceholderText={'Выбор дня недели'}
+					searchPlaceholderText={'Поиск...'}
+				/>
 				<TouchableOpacity style={styles.buttonGroup}>
 					<Link
-						href="/subjects"
+						href="/schedule"
 						asChild
 						style={styles.cancelButton}
 					>
@@ -150,14 +253,24 @@ const styles = StyleSheet.create({
 		fontSize: 32,
 	},
 	input: {
-		width: "100%",
-		borderStyle: "solid",
-		borderColor: "#ccc",
+		width: '100%',
+		borderStyle: 'solid',
+		borderColor: '#ccc',
 		borderRadius: 5,
 		borderWidth: 2,
 		padding: 10,
-		backgroundColor: "#fff",
-	},
+		backgroundColor: '#fff',
+	  },
+	  row: {
+		flexDirection: 'row', // изменение направления отображения элементов в строке
+		alignItems: 'center',
+	  },
+	  icon: {
+		marginLeft: 5, // изменение левого отступа иконки
+	  },
+	  inputText: {
+		flex: 1,
+	  },
 	addButton: {
 		flexDirection: 'row',
 		gap: 10,
