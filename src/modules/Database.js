@@ -31,6 +31,16 @@ export const setupDatabase = () => {
 	});
 	// таблица семестров
 	db.transaction((tx) => {
+		// tx.executeSql(
+		// 	"DROP TABLE IF EXISTS semesters",
+		// 	[],
+		// 	(_, result) => {
+		// 		console.log("Таблица semesters создана успешно");
+		// 	},
+		// 	(_, error) => {
+		// 		console.error("Ошибка при создании таблицы semesters: ", error);
+		// 	}
+		// );
 		tx.executeSql(
 			"create table IF NOT EXISTS semesters (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR, active BOOLEAN);",
 			[],
