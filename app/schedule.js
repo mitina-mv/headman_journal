@@ -1,10 +1,9 @@
-import { View, StyleSheet, FlatList, Pressable, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, FlatList, Pressable, Text, ScrollView } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useEffect, useState } from "react";
 import * as SQLite from "expo-sqlite";
-import FlatListItem from "../src/components/FlatListItem";
-import { Link } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Link } from "expo-router";
 
 export default function Time() {
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -20,7 +19,6 @@ export default function Time() {
 				`select * from semesters where active = true;`,
 				[],
 				(_, { rows: { _array } }) => {
-					console.log(_array);
 					if (_array.length > 0) {
 						setCurrentSemester(_array[0]);
 					} else {
@@ -37,13 +35,6 @@ export default function Time() {
 		});
 	};
 
-	useEffect(() => {
-		fetchCurrentSemester();
-		fetchSchedule("white");
-		fetchSchedule("green");
-	}, [isRefreshing]);
-
-	// Функция для запроса расписания с учетом текущего семестра и недели
 	const fetchSchedule = (nedela) => {
 		if (!currentSemester) {
 			console.error("Текущий семестр не определен.");
@@ -52,10 +43,15 @@ export default function Time() {
 
 		db.transaction((tx) => {
 			tx.executeSql(
-				`SELECT * FROM schedule WHERE semester_id = ? AND nedela = ?;`,
+				`SELECT schedule.*, semesters.name as semester_name, subjects.name as subject_name, times.name as time_name
+				FROM schedule
+				LEFT JOIN semesters ON schedule.semester_id = semesters.id
+				LEFT JOIN subjects ON schedule.subject_id = subjects.id
+				LEFT JOIN times ON schedule.time_id = times.id
+				WHERE schedule.semester_id = ? AND schedule.nedela = ?
+				ORDER BY times.name ASC;`,
 				[currentSemester.id, nedela],
 				(_, { rows: { _array } }) => {
-					// Разделяем расписание на белую и зеленую недели
 					if (nedela === "white") {
 						setWhiteSchedule(_array);
 					} else if (nedela === "green") {
@@ -69,14 +65,12 @@ export default function Time() {
 		});
 	};
 
-	// Вместо вызова fetchData в deleteSchedule и handleRefresh используем fetchSchedule
 	const deleteSchedule = (id, nedela) => {
 		db.transaction((tx) => {
 			tx.executeSql(
 				"DELETE FROM schedule WHERE id=(?);",
 				[id],
 				(_, result) => {
-					console.log(`Удалили: `, id);
 					fetchSchedule(nedela);
 				},
 				(_, error) => {
@@ -88,14 +82,100 @@ export default function Time() {
 
 	const handleRefresh = () => {
 		setIsRefreshing(true);
-		fetchSchedule("white"); // Здесь укажите нужную неделю
-		fetchSchedule("green"); // Здесь укажите нужную неделю
+		fetchSchedule("white");
+		fetchSchedule("green");
 		setIsRefreshing(false);
 	};
 
 	const toggleNedela = (nedela) => {
 		setSelectedNedela(nedela);
+		handleRefresh()
 	};
+
+	const groupScheduleByDay = (schedule) => {
+		const groupedSchedule = {};
+		schedule.forEach((item) => {
+			const day = item.day.toLowerCase();
+			if (!groupedSchedule[day]) {
+				groupedSchedule[day] = [];
+			}
+			groupedSchedule[day].push(item);
+		});
+		return groupedSchedule;
+	};
+
+	const renderGroupedSchedule = (groupedSchedule) => {
+		const daysOfWeek = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+		return daysOfWeek.map((day) => {
+			const scheduleForDay = groupedSchedule[day] || [];
+			return (
+				<View key={day}>
+					<Text style={styles.dayHeading}>{getDayName(day)}</Text>
+					<FlatList
+						data={scheduleForDay}
+						renderItem={({ item }) => (
+							<View style={styles.scheduleItem}>
+								<Text style={styles.scheduleItemTime}>
+									{item.time_name}
+								</Text>
+								<Text style={styles.scheduleItemText}>
+									{item.subject_name}
+								</Text>
+								<Pressable
+									onPress={() =>
+										deleteSchedule(item.id, selectedNedela)
+									}
+								>
+									<Text style={styles.deleteButton}>
+										Удалить
+									</Text>
+								</Pressable>
+							</View>
+						)}
+						ListEmptyComponent={() => (
+							<View style={styles.scheduleItem}>
+								<Text style={styles.noScheduleText}>
+									Нет занятий
+								</Text>
+							</View>
+						)}
+						keyExtractor={(item) => item.id.toString()}
+					/>
+				</View>
+			);
+		});
+	};
+
+	const getDayName = (day) => {
+		switch (day) {
+			case "mon":
+				return "Понедельник";
+			case "tue":
+				return "Вторник";
+			case "wed":
+				return "Среда";
+			case "thu":
+				return "Четверг";
+			case "fri":
+				return "Пятница";
+			case "sat":
+				return "Суббота";
+			case "sun":
+				return "Воскресенье";
+			default:
+				return "";
+		}
+	};
+
+	useEffect(() => {
+		fetchCurrentSemester();
+		fetchSchedule("white");
+		fetchSchedule("green");
+	}, [isRefreshing]);
+
+	const groupedWhiteSchedule = groupScheduleByDay(whiteSchedule);
+	const groupedGreenSchedule = groupScheduleByDay(greenSchedule);
 
 	return (
 		<SafeAreaProvider>
@@ -124,25 +204,13 @@ export default function Time() {
 						</Pressable>
 					</View>
 
-					<FlatList
-						data={
-							selectedNedela === "white"
-								? whiteSchedule
-								: greenSchedule
-						}
-						renderItem={({ item }) => (
-							<FlatListItem
-								name={item.name + ` (${item.reduction})`}
-								id={item.id}
-								onDelete={() =>
-									deleteSchedule(item.id, selectedNedela)
-								}
-							/>
-						)}
-						keyExtractor={(item) => item.id}
-						refreshing={isRefreshing}
-						onRefresh={handleRefresh}
-					></FlatList>
+					<ScrollView>
+					{renderGroupedSchedule(
+						selectedNedela === "white"
+							? groupedWhiteSchedule
+							: groupedGreenSchedule
+					)}
+					</ScrollView>
 
 					<Link
 						href="/create/schedul"
@@ -163,6 +231,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		justifyContent: "space-between",
+		padding: 10
 	},
 	content: {
 		flex: 1,
@@ -185,15 +254,42 @@ const styles = StyleSheet.create({
 	nedelaToggle: {
 		flex: 1,
 		padding: 10,
-		backgroundColor: "#30BA8F",
+		backgroundColor: "#ccc",
 		borderRadius: 5,
 		alignItems: "center",
 	},
 	selectedNedelaToggle: {
-		backgroundColor: "#40803D",
+		backgroundColor: "#30BA8F",
 	},
 	nedelaToggleText: {
 		color: "#fff",
 		fontWeight: "bold",
+	},
+	dayHeading: {
+		fontSize: 18,
+		fontWeight: "bold",
+		marginBottom: 5,
+		marginTop: 10
+	},
+	scheduleItem: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		padding: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: "#ccc",
+	},
+	deleteButton: {
+		color: "red",
+	},
+	scheduleItemText: {
+		flex: 1,
+	},
+	scheduleItemTime: {
+		fontWeight: '700',
+		color: '#424242',
+		paddingRight: 10
+	},
+	noScheduleText: {
+		color: "#888", // Либо другой цвет на ваш выбор
 	},
 });

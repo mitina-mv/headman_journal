@@ -18,18 +18,17 @@ import PickerModal from 'react-native-picker-modal-view';
 
 
 export default function Page() {
-	const [selectedNedela, setSelectedNedela] = useState([]);
+	const [selectedNedela, setSelectedNedela] = useState(null);
 	const [subjects, setSubjects] = useState([]);
 	const [times, setTimes] = useState([]);
-	const [selectedSubject, setSelectedSubject] = useState([]);
-	const [selectedTime, setSelectedTime] = useState([]);
-	const [selectedDay, setSelectedDay] = useState([]);
+	const [selectedSubject, setSelectedSubject] = useState(null);
+	const [selectedTime, setSelectedTime] = useState(null);
+	const [selectedDay, setSelectedDay] = useState(null);
 	const [currentSemester, setCurrentSemester] = useState(null);
 
 	const db = SQLite.openDatabase("jornal.db");
 
 	useEffect(() => {
-		console.log(selectedNedela.Name);
 		fetchData();
 	}, []);
 
@@ -73,7 +72,6 @@ export default function Page() {
 				`select * from semesters where active = true;`,
 				[],
 				(_, { rows: { _array } }) => {
-					console.log(_array);
 					if (_array.length > 0) {
 						setCurrentSemester(_array[0]);
 					} else {
@@ -91,21 +89,21 @@ export default function Page() {
 	};
 
     const pressHandler = () => {
-        if(value.trim() && reduction.trim()) {
-            addSubject(value.trim(), reduction.trim())
+        if(selectedSubject && selectedTime && selectedNedela && selectedDay && currentSemester) {
+            addSchedule()
         } else {
             Alert.alert('Все поля должны быть заполнены!')	
         }
     };
 
-	const addSubject = (name, red) => {
+	const addSchedule = () => {
 		db.transaction((tx) => {
 			tx.executeSql(
-				"INSERT INTO subjects (name, reduction) VALUES (?, ?);",
-				[name, red],
+				"INSERT INTO schedule (subject_id, time_id, nedela, day, semester_id) VALUES (?, ?, ?, ?, ?);",
+				[selectedSubject.Value, selectedTime.Value, selectedNedela.Value, selectedDay.Value, currentSemester.id],
 				(_, result) => {
-					console.log(`Добавлен элемент: `, value);
-					router.replace('/subjects');
+					console.log(`Добавлен элемент: `, selectedSubject.Value);
+					router.replace('/schedule');
 				},
 				(_, error) => {
 					console.error("Ошибка при добавлении элемента: ", error);
@@ -113,7 +111,7 @@ export default function Page() {
 			);
 		});
 	};
-
+	
 	return (
 		<SafeAreaProvider>
 			<View style={styles.container}>
@@ -122,7 +120,7 @@ export default function Page() {
 						<TouchableOpacity style={styles.input} onPress={showModal}>
 							<View style={styles.row}>
 							<Text style={styles.inputText}>
-								{selectedNedela.Name ? selectedNedela.Name : 'Выбор недели'}
+								{selectedNedela ? selectedNedela.Name : 'Выбор недели'}
 							</Text>
 							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
 							</View>
@@ -148,7 +146,7 @@ export default function Page() {
 						<TouchableOpacity style={styles.input} onPress={showModal}>
 							<View style={styles.row}>
 							<Text style={styles.inputText}>
-								{selectedSubject.Name ? selectedSubject.Name : 'Выбор предмета'}
+								{selectedSubject ? selectedSubject.Name : 'Выбор предмета'}
 							</Text>
 							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
 							</View>
@@ -171,7 +169,7 @@ export default function Page() {
 						<TouchableOpacity style={styles.input} onPress={showModal}>
 							<View style={styles.row}>
 							<Text style={styles.inputText}>
-								{selectedTime.Name ? selectedTime.Name : 'Выбор времени'}
+								{selectedTime ? selectedTime.Name : 'Выбор времени'}
 							</Text>
 							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
 							</View>
@@ -194,7 +192,7 @@ export default function Page() {
 						<TouchableOpacity style={styles.input} onPress={showModal}>
 							<View style={styles.row}>
 							<Text style={styles.inputText}>
-								{selectedDay.Name ? selectedDay.Name : 'Выбор дня недели'}
+								{selectedDay ? selectedDay.Name : 'Выбор дня недели'}
 							</Text>
 							<FontAwesome name="angle-down" size={24} color="#424242" style={styles.icon} />
 							</View>
