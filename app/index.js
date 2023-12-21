@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, ScrollView } from "react-native";
 import DateSwitcher from "./../src/components/DateSwitcher";
 import { setupDatabase } from "./../src/modules/Database";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabase("jornal.db");
@@ -18,13 +19,12 @@ export default function Page() {
 		fetchStudents();
 		fetchSchedule();
 		fetchAttendance();
-	}, [currentDate]);
+	}, []);
 
 	const updateDate = (newDate) => {
 	  	setCurDate(newDate)
 		fetchSchedule(newDate);
 		fetchAttendance(newDate);
-
 	}
 
 	const fetchStudents = () => {
@@ -51,7 +51,7 @@ export default function Page() {
 
 		db.transaction((tx) => {
 			tx.executeSql(
-				"SELECT schedule.*, subjects.reduction as subject_reduction FROM schedule LEFT JOIN subjects ON schedule.subject_id = subjects.id WHERE schedule.day = ? AND schedule.nedela = ?;",
+				"SELECT schedule.*, subjects.reduction as subject_reduction FROM schedule LEFT JOIN subjects ON schedule.subject_id = subjects.id LEFT JOIN times ON schedule.time_id = times.id WHERE schedule.day = ? AND schedule.nedela = ? ORDER BY times.name ASC;",
 				[dayOfWeek, selectedNedela],
 				(_, { rows: { _array } }) => {
 					setSchedule(_array);
@@ -94,6 +94,12 @@ export default function Page() {
 		console.log(schedule);
 		console.log('attendance toggleNedela:',attendance);
 	};
+
+	const pressHandle = () => {
+		fetchStudents();
+		fetchSchedule();
+		fetchAttendance();
+	}
 
 	const markAttendance = (studentId, subjectId) => {
 		const formattedDate = formatDate(currentDate);
@@ -211,6 +217,9 @@ export default function Page() {
 						</View>
 					))}
 				</ScrollView>
+				<Pressable style={styles.addButton} onPress={pressHandle}>
+					<FontAwesome name="refresh" size={24} color="#fff" />
+				</Pressable>
 			</View>
 		</View>
 	);
@@ -258,5 +267,14 @@ const styles = StyleSheet.create({
 	nedelaToggleText: {
 		color: "#fff",
 		fontWeight: "bold",
+	},
+	addButton: {
+		position: "absolute",
+		bottom: 10,
+		right: 10,
+		padding: 15,
+		paddingHorizontal: 18,
+		backgroundColor: "#aaa",
+		borderRadius: 100,
 	},
 });
